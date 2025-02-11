@@ -121,7 +121,7 @@
                                                                 <div class="d-flex mb-3">
                                                                     <div class="flex-grow-1">
                                                                         <i class="mdi mdi-checkbox-blank-circle me-2 {{$badgeClass}}"></i>
-                                                                        <span class="fw-medium">{{$item['day']}}</span>
+                                                                        <span class="fw-medium">{{$startDate->format('d/m/Y')}}</span>
                                                                     </div>
                                                                     <div class="flex-shrink-0">
                                                                         <small class="badge bg-primary-subtle text-primary ms-auto">

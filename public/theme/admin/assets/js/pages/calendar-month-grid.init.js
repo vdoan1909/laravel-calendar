@@ -181,12 +181,16 @@ document.addEventListener("DOMContentLoaded", function () {
     b.render();
 
     function openEventModal(info) {
-        document.getElementById("form-event").reset();
-        document.getElementById("btn-delete-event").setAttribute("hidden", true);
-        g.show();
-        i.classList.remove("was-validated");
-        v = null;
-        l.innerText = "Thêm sự kiện";
+        if (role == lecturerRole) {
+            document.getElementById("form-event").reset();
+            document.getElementById("btn-delete-event").setAttribute("hidden", true);
+            g.show();
+            i.classList.remove("was-validated");
+            v = null;
+            l.innerText = "Thêm sự kiện";
+        }else{
+            alert("Hãy chọn 1 lịch");
+        }
     }
 
     function openEditModal(info) {
