@@ -22,6 +22,8 @@ Route::prefix('lecturer')
             ->name('schedule.store');
         Route::patch('/{id}', [LecturerController::class, 'update'])
             ->name('schedule.update');
+        Route::delete('/{id}', [LecturerController::class, 'delete'])
+            ->name('schedule.delete');
     });
 
 Route::get('/', function () {

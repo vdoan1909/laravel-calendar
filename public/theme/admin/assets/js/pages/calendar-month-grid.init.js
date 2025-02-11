@@ -37,38 +37,38 @@ function eventTyped() {
     document.getElementById("form-event").classList.remove("view-event"), document.getElementById("event-title").classList.replace("d-none", "d-block"), document.getElementById("event-start-date").parentNode.classList.remove("d-none"), document.getElementById("event-start-date").classList.replace("d-none", "d-block"), document.getElementById("timepicker1").parentNode.classList.remove("d-none"), document.getElementById("timepicker1").classList.replace("d-none", "d-block"), document.getElementById("timepicker2").parentNode.classList.remove("d-none"), document.getElementById("timepicker2").classList.replace("d-none", "d-block"), document.getElementById("event-description").classList.replace("d-none", "d-block"), document.getElementById("event-start-date-tag").classList.replace("d-block", "d-none"), document.getElementById("event-timepicker1-tag").classList.replace("d-block", "d-none"), document.getElementById("event-timepicker2-tag").classList.replace("d-block", "d-none"), document.getElementById("event-description-tag").classList.replace("d-block", "d-none"), document.getElementById("btn-save-event").removeAttribute("hidden")
 }
 
-function upcomingEvent(e) {
-    e.sort(function (e, t) {
-        return new Date(e.start) - new Date(t.start)
-    }), document.getElementById("upcoming-event-list").innerHTML = null, Array.from(e).forEach(function (e) {
-        var t = e.title,
-            n = (i = e.end ? (endUpdatedDay = new Date(e.end)).setDate(endUpdatedDay.getDate() - 1) : i) || void 0;
-        n = "Invalid Date" == n || null == n ? null : (a = new Date(n).toLocaleDateString("en", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric"
-        }), new Date(a).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }).split(" ").join(" "));
-        (e.start ? str_dt(e.start) : null) === (i ? str_dt(i) : null) && (n = null);
-        var a = e.start,
-            d = (a = "Invalid Date" === a || void 0 === a ? null : (d = new Date(a).toLocaleDateString("en", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric"
-            }), new Date(d).toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric"
-            }).split(" ").join(" ")), n ? " to " + n : ""),
-            l = e.description || "",
-            e = tConvert(getTime(e.start)),
-            i = (e == (i = tConvert(getTime(i))) && (e = "Full day event", i = null), i ? " to " + i : "");
-        u_event = "<div class='card mb-3'>                        <div class='card-body'>                            <div class='d-flex mb-3'>                                <div class='flex-grow-1'><i class='mdi mdi-checkbox-blank-circle me-2 text-" + n[1] + "'></i><span class='fw-medium'>" + a + d + " </span></div>                                <div class='flex-shrink-0'><small class='badge bg-primary-subtle text-primary ms-auto'>" + e + i + "</small></div>                            </div>                            <h6 class='card-title fs-16'> " + t + "</h6>                            <p class='text-muted text-truncate-two-lines mb-0'> " + l + "</p>                        </div>                    </div>", document.getElementById("upcoming-event-list").innerHTML += u_event
-    })
-}
+// function upcomingEvent(e) {
+//     e.sort(function (e, t) {
+//         return new Date(e.start) - new Date(t.start)
+//     }), document.getElementById("upcoming-event-list").innerHTML = null, Array.from(e).forEach(function (e) {
+//         var t = e.title,
+//             n = (i = e.end ? (endUpdatedDay = new Date(e.end)).setDate(endUpdatedDay.getDate() - 1) : i) || void 0;
+//         n = "Invalid Date" == n || null == n ? null : (a = new Date(n).toLocaleDateString("en", {
+//             year: "numeric",
+//             month: "numeric",
+//             day: "numeric"
+//         }), new Date(a).toLocaleDateString("en-GB", {
+//             day: "numeric",
+//             month: "short",
+//             year: "numeric"
+//         }).split(" ").join(" "));
+//         (e.start ? str_dt(e.start) : null) === (i ? str_dt(i) : null) && (n = null);
+//         var a = e.start,
+//             d = (a = "Invalid Date" === a || void 0 === a ? null : (d = new Date(a).toLocaleDateString("en", {
+//                 year: "numeric",
+//                 month: "numeric",
+//                 day: "numeric"
+//             }), new Date(d).toLocaleDateString("en-GB", {
+//                 day: "numeric",
+//                 month: "short",
+//                 year: "numeric"
+//             }).split(" ").join(" ")), n ? " to " + n : ""),
+//             l = e.description || "",
+//             e = tConvert(getTime(e.start)),
+//             i = (e == (i = tConvert(getTime(i))) && (e = "Full day event", i = null), i ? " to " + i : "");
+//         u_event = "<div class='card mb-3'>                        <div class='card-body'>                            <div class='d-flex mb-3'>                                <div class='flex-grow-1'><i class='mdi mdi-checkbox-blank-circle me-2 text-" + n[1] + "'></i><span class='fw-medium'>" + a + d + " </span></div>                                <div class='flex-shrink-0'><small class='badge bg-primary-subtle text-primary ms-auto'>" + e + i + "</small></div>                            </div>                            <h6 class='card-title fs-16'> " + t + "</h6>                            <p class='text-muted text-truncate-two-lines mb-0'> " + l + "</p>                        </div>                    </div>", document.getElementById("upcoming-event-list").innerHTML += u_event
+//     })
+// }
 
 function getTime(e) {
     if (null != (e = new Date(e)).getHours()) return e.getHours() + ":" + (e.getMinutes() ? e.getMinutes() : 0)
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     closeJoinModal();
                 }
             })
-            .catch(error => console.error("Lỗi:", error));
+            .catch(error => console.error(error));
     });
 
     function saveEvent(eventData) {
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Lỗi khi lưu sự kiện!");
                 }
             })
-            .catch(error => console.error("Lỗi:", error));
+            .catch(error => console.error(error));
     }
 
     function updateEvent(event) {
@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (!data.success) {
-                    alert("Lỗi khi cập nhật sự kiện!");
+                    alert("Lỗi khi cập nhật sự kiện");
                 } else {
                     g.hide();
 
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     toast.show();
                 }
             })
-            .catch(error => console.error("Lỗi:", error));
+            .catch(error => console.error(error));
     }
 
 
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // console.log(startTime, endTime);
         if (!title || !start || !startTime || !endTime) {
-            alert("Vui lòng nhập đủ thông tin!");
+            alert("Vui lòng nhập đủ thông tin");
             return;
         }
 
@@ -357,9 +357,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("btn-delete-event").addEventListener("click", function () {
         if (v) {
-            fetch("/delete", {
-                method: "POST",
-                body: JSON.stringify({ id: v.id }),
+            console.log(v.id);
+            let scheduleDeleteUrl = deleteScheduleUrl.replace(':id', v.id); 
+
+            fetch(scheduleDeleteUrl, {
+                method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -370,11 +372,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.success) {
                         v.remove();
                         g.hide();
-                    } else {
-                        alert("Lỗi khi xóa sự kiện!");
                     }
                 })
-                .catch(error => console.error("Lỗi:", error));
+                .catch(error => console.error(error));
         }
     });
 

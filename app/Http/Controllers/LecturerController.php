@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RoleEnum;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LecturerController extends Controller
 {
@@ -12,7 +14,31 @@ class LecturerController extends Controller
 
     public function index()
     {
-        return view(self::PATH_VIEW . __FUNCTION__);
+        $user = auth()->user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->role == RoleEnum::LECTURER->value) {
+            $data = Schedule::where('lecturer_id', auth()->user()->id)->get();
+        } else {
+            $data = $user->schedules()->with('lecturer')->get();
+        }
+
+        // dd($data);
+        $data = $data->map(function ($event) {
+            return [
+                'title' => $event->title,
+                'lecturerName' => $event->lecturer->name,
+                'day' => $event->start,
+                'startTime' => $event->start_time,
+                'endTime' => $event->end_time,
+                'description' => $event->description,
+            ];
+        })->sortBy('day')->values();
+
+        return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 
     public function store(Request $request)
@@ -61,7 +87,7 @@ class LecturerController extends Controller
             ]);
         } catch (\Exception $e) {
             // \Log::error($e->getMessage());
-            // return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            // return response()->json(['success' => false];
         }
     }
 
@@ -80,12 +106,13 @@ class LecturerController extends Controller
             // \Log::info($selectedDate->toDateString());
 
             if ($schedule->start !== $selectedDate->toDateString()) {
+                $enrolledUsers = $schedule->students()->pluck('users.id')->toArray();
+
                 Schedule::where('lecturer_id', auth()->id())
                     ->whereMonth('start', Carbon::parse($schedule->start)->month)
                     ->whereYear('start', Carbon::parse($schedule->start)->year)
                     ->where('day_of_week', $schedule->day_of_week)
                     ->delete();
-
 
                 $newSchedules = [];
                 $now = Carbon::now();
@@ -106,6 +133,26 @@ class LecturerController extends Controller
                 }
 
                 Schedule::insert($newSchedules);
+
+                $newScheduleIds = Schedule::where('lecturer_id', auth()->id())
+                    ->whereMonth('start', $selectedDate->month)
+                    ->whereYear('start', $selectedDate->year)
+                    ->where('day_of_week', $selectedDate->dayOfWeek)
+                    ->pluck('id')
+                    ->toArray();
+
+                DB::table('enrollments')->whereIn('schedule_id', [$id])->delete();
+                foreach ($enrolledUsers as $userId) {
+                    foreach ($newScheduleIds as $scheduleId) {
+                        DB::table('enrollments')->insert([
+                            'student_id' => $userId,
+                            'schedule_id' => $scheduleId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+
                 return response()->json(['success' => true, 'schedules' => $newSchedules]);
             } else {
                 $schedule->update([
@@ -120,7 +167,28 @@ class LecturerController extends Controller
             }
         } catch (\Exception $e) {
             // \Log::error($e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false]);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $schedule = Schedule::findOrFail($id);
+
+            DB::table('enrollments')->where('schedule_id', $id)->delete();
+
+            $schedule->delete();
+
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+            ]);
         }
     }
 
@@ -146,7 +214,7 @@ class LecturerController extends Controller
             ]);
         } catch (\Exception $e) {
             // \Log::error($e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false]);
         }
     }
 
@@ -175,7 +243,7 @@ class LecturerController extends Controller
         } catch (\Exception $e) {
             // \Log::error($e->getMessage());
 
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false]);
         }
     }
 
@@ -183,23 +251,35 @@ class LecturerController extends Controller
     {
         try {
             $user = auth()->user();
-            $scheduleId = $request->id;
-            \Log::info($scheduleId);
             if (!$user) {
                 return redirect()->route('login');
             }
 
-            $user->schedules()->sync([$scheduleId]);
+            $scheduleId = $request->id;
+            // \Log::info($scheduleId);
+
+            $schedule = Schedule::findOrFail($scheduleId);
+
+            $scheduleIds = Schedule::where('lecturer_id', $schedule->lecturer_id)
+                ->whereMonth('start', Carbon::parse($schedule->start)->month)
+                ->whereYear('start', Carbon::parse($schedule->start)->year)
+                ->where('day_of_week', $schedule->day_of_week)
+                ->pluck('id')
+                ->toArray();
+            // \Log::info($scheduleIds);
+
+            $scheduleIds[] = $scheduleId;
+
+            $user->schedules()->sync($scheduleIds);
 
             return response()->json([
                 'success' => true,
             ]);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            // \Log::error($e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
             ], 500);
         }
     }

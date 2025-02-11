@@ -86,11 +86,63 @@
                         </div>
                     </div>
                 @endif
-                <div>
+                {{-- <div>
                     <h5 class="mb-1">Upcoming Events</h5>
                     <p class="text-muted">Don't miss scheduled events</p>
                     <div class="pe-2 me-n1 mb-3" data-simplebar style="height: 580px">
                         <div id="upcoming-event-list"></div>
+                    </div>
+                </div> --}}
+
+                <div>
+                    <h5 class="mb-1">Upcoming Events</h5>
+                    <p class="text-muted">Don't miss scheduled events</p>
+                    <div class="pe-2 me-n1 mb-3" data-simplebar style="height: 580px">
+                        <div id="upcoming-event-list">
+                            @foreach ($data as $item)      
+                                                        @php
+                                                            $startDate = \Carbon\Carbon::parse($item['day']);
+                                                            $today = \Carbon\Carbon::today();
+                                                            $differenceInDays = $today->diffInDays($startDate, false);
+
+                                                            if ($differenceInDays == 1) {
+                                                                $badgeClass = 'text-danger';
+                                                            } elseif ($differenceInDays >= 2 && $differenceInDays < 7) {
+                                                                $badgeClass = 'text-warning';
+                                                            } elseif ($differenceInDays >= 7) {
+                                                                $badgeClass = 'text-success';
+                                                            } else {
+                                                                $badgeClass = 'text-muted';
+                                                            }
+                                                        @endphp
+
+                                                        <div class="card mb-3">
+                                                            <div class="card-body">
+                                                                <div class="d-flex mb-3">
+                                                                    <div class="flex-grow-1">
+                                                                        <i class="mdi mdi-checkbox-blank-circle me-2 {{$badgeClass}}"></i>
+                                                                        <span class="fw-medium">{{$item['day']}}</span>
+                                                                    </div>
+                                                                    <div class="flex-shrink-0">
+                                                                        <small class="badge bg-primary-subtle text-primary ms-auto">
+                                                                            {{$item['startTime']}} to {{$item['endTime']}}
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                                <h6 class="card-title fs-16">{{$item['title']}}</h6>
+
+                                                                @if (auth()->user()->role == \App\Enums\RoleEnum::STUDENT->value)
+                                                                    <p class="text-muted mb-1"><strong>Lecturer:</strong> {{$item['lecturerName']}}</p>
+                                                                @endif
+
+                                                                <p class="text-muted text-truncate-two-lines mb-0">
+                                                                    {{$item['description'] ?? ''}}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                            @endforeach
+
+                        </div>
                     </div>
                 </div>
             </div> <!-- end col-->
@@ -249,6 +301,7 @@
     var scheduleListForStudentUrl = "{{ route('lecturer.scheduleListForStudent') }}";
     var scheduleStoreUrl = "{{ route('lecturer.schedule.store') }}";
     var updateScheduleUrl = "{{ route('lecturer.schedule.update', ':id') }}";
+    var deleteScheduleUrl = "{{ route('lecturer.schedule.delete', ':id') }}";
     var role = "{{ Auth::user()->role }}";
     var lecturerRole = "{{ App\Enums\RoleEnum::LECTURER->value }}";
 
